@@ -1,0 +1,26 @@
+<!-- this should be incapsulated in its own component, see https://developer.salesforce.com/docs/component-library/bundle/lightning-modal/documentation -->
+<template>
+  <lightning-modal-header label="Student Details"></lightning-modal-header>
+
+  <lightning-modal-body>
+    <lightning-accordion
+      allow-multiple-sections-open
+      onsectiontoggle={handleSectionToggle}
+      active-section-name={activeSections}>
+      
+      <lightning-accordion-section name="studentInfo" label="Student Information">
+        <lightning-record-view-form density="compact" object-api-name={objectApiName} record-id={recordId}>
+        
+        <lightning-output-field field-name={nameField} variant="standard">
+        
+        </lightning-output-field>
+        </lightning-record-view-form>
+      </lightning-accordion-section>
+
+      <lightning-accordion-section name="studyResultInfo" label="Study Result Information">
+      </lightning-accordion-section>
+    </lightning-accordion>
+  </lightning-modal-body>
+
+  <lightning-modal-footer>{footerContent}</lightning-modal-footer>
+</template>

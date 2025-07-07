@@ -1,0 +1,72 @@
+<template>
+  <lightning-card icon-name="standard:filter" variant="base">
+    <div slot="title">Student Search</div>
+    <div class="slds-box slds-m-horizontal_small">
+      <div>
+        <h1 class="slds-text-heading_large">Search Condition</h1>
+        <div class="slds-size_2-of-3">
+          <div class="slds-grid slds-wrap">
+            <!-- Card Body  -->
+            <div class="slds-size_1-of-2">
+              <lightning-input
+                data-name="studentNameInput"
+                type="search"
+                label="Student Name"
+                variant="label-inline"
+              ></lightning-input>
+            </div>
+
+            <div class="slds-size_1-of-2">
+              <lightning-input
+                data-name="birthdateInput"
+                type="date"
+                date-style="short"
+                label="Birthdate"
+                variant="label-inline"
+              ></lightning-input>
+            </div>
+
+            <div class="slds-size_1-of-2">
+              <lightning-combobox
+                data-name="classInput"
+                label="Class"
+                placeholder="--None--"
+                options={classes}
+                variant="label-inline"
+              ></lightning-combobox>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-align_absolute-center">
+        <lightning-button
+          class="my-custom-style"
+          label="Search"
+          variant="brand"
+          onclick={handleSearch}
+        ></lightning-button>
+        <lightning-button
+          label="Clear Condition"
+          variant="neutral"
+          icon-name="utility:close"
+          onclick={handleClear}
+        ></lightning-button>
+      </div>
+    </div>
+
+    <div class="slds-box slds-m-top_medium slds-m-horizontal_small">
+      <lightning-datatable
+        key-field="studentId"
+        data={dataTable}
+        columns={columns}
+        show-row-number-column
+        hide-checkbox-column
+        sorted-direction={sortDirection}
+        sorted-by={sortedBy}
+        onsort={onHandleSort}
+        onrowaction={handleRowAction}
+      ></lightning-datatable>
+    </div>
+  </lightning-card>
+</template>

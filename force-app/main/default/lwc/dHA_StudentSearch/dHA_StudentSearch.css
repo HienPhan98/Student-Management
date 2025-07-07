@@ -1,0 +1,5 @@
+.my-custom-style {
+  margin-right: 30px;
+  --slds-c-button-brand-color-background: var(--slds-g-color-brand-base-65);
+  --slds-c-button-brand-text-color: black;
+}
