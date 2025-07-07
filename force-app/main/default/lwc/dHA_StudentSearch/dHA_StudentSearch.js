@@ -3,6 +3,7 @@ import getAllClasses from "@salesforce/apex/StudentClassController.getAllClasses
 import searchStudents from "@salesforce/apex/StudentClassController.searchStudents";
 import getRecentlyViewedStudents from "@salesforce/apex/StudentClassController.getRecentlyViewedStudents";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import DHA_StudentSearchDetailModal from "c/dHA_StudentSearchDetailModal";
 
 const actions = [
     { label: 'Show details', name: 'show_details'},
@@ -64,7 +65,7 @@ export default class dHA_StudentSearch extends LightningElement {
     };
   }
 
-  sortDataDirection(sortedBy, sortDirection){
+  sortDataDirection(sortedBy, sortDirection) {
     const cloneData = [...this.dataTable];
     cloneData.sort(this.sortBy(sortedBy, sortDirection === "asc" ? 1 : -1));
     this.dataTable = cloneData;
@@ -76,7 +77,7 @@ export default class dHA_StudentSearch extends LightningElement {
     const { fieldName: sortedBy, sortDirection } = event.detail;
     this.sortDataDirection(sortedBy, sortDirection);
   }
-  
+
   showDataOnTable(listStudents) {
     //check if no record was found with filter values, then return error immediately
     if (listStudents.length === 0) {
@@ -135,9 +136,19 @@ export default class dHA_StudentSearch extends LightningElement {
           month: "2-digit"
         }
       },
-      { label: "Address", fieldName: "studentAddress", hideDefaultActions: true, type: "text" },
-      { label: "Email", fieldName: "studentEmail", hideDefaultActions: true, type: "email" },
-      { type: "action", typeAttributes: { rowActions: actions }}
+      {
+        label: "Address",
+        fieldName: "studentAddress",
+        hideDefaultActions: true,
+        type: "text"
+      },
+      {
+        label: "Email",
+        fieldName: "studentEmail",
+        hideDefaultActions: true,
+        type: "email"
+      },
+      { type: "action", typeAttributes: { rowActions: actions } }
     ];
     //Apply the previous sort direction and column
     this.sortDataDirection(this.sortedBy, this.sortDirection);
@@ -191,14 +202,25 @@ export default class dHA_StudentSearch extends LightningElement {
     this.columns = null;
   }
 
-  handleRowAction(event) {
-        const actionName = event.detail.action.name;
-        const row = event.detail.row;
-        switch (actionName) {
-            case 'show_details':
-                this.showRowDetails(row);
-                break;
-            default:
+  async handleRowAction(event) {
+    try{
+    const actionName = event.detail.action.name;
+    const selectedRows = event.detail.row;
+    switch (actionName) {
+      case "show_details":
+        {
+          console.log("lalalala");
+          await DHA_StudentSearchDetailModal.open({
+            size: "medium",
+            description: "Student Detail",
+            recordId: selectedRows.studentId // Pass to modal via @api decoration
+          });
         }
+        break;
+      default:
+    }}catch(error){
+      console.error(JSON.stringify(error));
     }
+    
+  }
 }
