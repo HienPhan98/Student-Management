@@ -103,55 +103,10 @@ public with sharing class StudentClassController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static Integer countAssignedClassesOfStudent(String studentId) {
+  public static StudentResultInformation getSummaryStudyResultInfo(String studentId) {
     try {
-      return [
-        SELECT COUNT()
-        FROM DHA_Class_Assignment__c
-        WHERE DHA_Student__r.Id = :studentId
-        WITH SECURITY_ENFORCED
-      ];
-    } catch (Exception e) {
-      CustomExceptionData myException = new CustomExceptionData(
-        'StudentClassController',
-        'countAssignedClassesOfStudent',
-        e.getMessage(),
-        e.getLineNumber().toString()
-      );
-      throw new AuraHandledException(JSON.serialize(myException));
-    }
-  }
-
-  @AuraEnabled(cacheable=true)
-  public static Integer countClassHaveFinalScore(String studentId) {
-    try {
-      Integer countClassHaveFinalScore = 0;
-      List<DHA_Class_Assignment__c> listAssignment = [
-        SELECT Id,
-          (
-            SELECT Final_Score__c
-            FROM DHA_Study_Results__r
-            WHERE Final_Score__c != NULL
-          )
-        FROM DHA_Class_Assignment__c
-        WHERE DHA_Student__r.Id = :studentId
-        WITH SECURITY_ENFORCED
-      ];
-      for (DHA_Class_Assignment__c ca : listAssignment) {
-        List<DHA_Study_Result__c> listStudyResult = ca.DHA_Study_Results__r;
-        if (listStudyResult.size() > 0) {
-          countClassHaveFinalScore = listStudyResult.size();
-        }
-      }
-      return countClassHaveFinalScore;
-    } catch (Exception e) {
-      throw new AuraHandledException(e.getMessage());
-    }
-  }
-
-  @AuraEnabled(cacheable=true)
-  public static List<String> getAverageScores(String studentId) {
-    try {
+      Integer countAssignedClasses;
+      Integer countClassHasFinalScore = 0;
       List<String> averageScores = new List<String>();
       List<DHA_Class_Assignment__c> listAssignment = [
         SELECT Id,
@@ -164,16 +119,45 @@ public with sharing class StudentClassController {
         WHERE DHA_Student__r.Id = :studentId
         WITH SECURITY_ENFORCED
       ];
+      //count assigned classes of student
+      countAssignedClasses = listAssignment.size();
       for (DHA_Class_Assignment__c ca : listAssignment) {
         List<DHA_Study_Result__c> listStudyResult = ca.DHA_Study_Results__r;
         if (listStudyResult.size() > 0) {
+          countClassHasFinalScore = listStudyResult.size();
           for(DHA_Study_Result__c studyResult : listStudyResult) 
           {
             averageScores.add(studyResult.Final_Score__c.toString());
           }
         }
       }
-      return averageScores;
+      system.debug(countAssignedClasses + '---' + countClassHasFinalScore + '---' + averageScores);
+      return new StudentResultInformation(countAssignedClasses, countClassHasFinalScore, averageScores);
+    } catch (Exception e) {
+      CustomExceptionData myException = new CustomExceptionData(
+        'StudentClassController',
+        'getSummaryStudyResultInfo',
+        e.getMessage(),
+        e.getLineNumber().toString()
+      );
+      throw new AuraHandledException(JSON.serialize(myException));
+    }
+  }
+
+  @AuraEnabled(cacheable=true)
+  public static List<DHA_Class_Assignment__c> getDetailStudyResultInfo(String studentId){
+    try {
+      return [
+        SELECT Id,DHA_Class__r.Id,DHA_Class__r.Name,
+          (
+            SELECT 	Score_1__c, Score_2__c, Score_3__c,Final_Score__c, Result__c
+            FROM DHA_Study_Results__r
+            WHERE Final_Score__c != NULL
+          )
+        FROM DHA_Class_Assignment__c
+        WHERE DHA_Student__r.Id = :studentId
+        WITH SECURITY_ENFORCED
+      ];
     } catch (Exception e) {
       throw new AuraHandledException(e.getMessage());
     }

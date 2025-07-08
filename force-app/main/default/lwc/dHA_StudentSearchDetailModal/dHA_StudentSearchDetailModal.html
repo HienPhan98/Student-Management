@@ -29,7 +29,7 @@
             <div class="">
               <div>
                 <label class="slds-form-element__label">Assigned Classes</label>
-                <span>{assignedClasses.data}</span>
+                <span>{assignedClasses}</span>
               </div>
               <div>
                 <label class="slds-form-element__label">Average Final Score</label>
@@ -41,10 +41,15 @@
           <lightning-layout-item>
             <div>
               <label class="slds-form-element__label">Class(es) Have Final Score</label>
-              <span>{classesHaveFinalScore.data}</span>
+              <span>{classesHaveFinalScore}</span>
             </div>
           </lightning-layout-item>
         </lightning-layout>
+        <template if:true={data}>
+          <lightning-datatable key-field="id" data={data} columns={columns}  hide-checkbox-column>
+            
+          </lightning-datatable>
+        </template>
       </lightning-accordion-section>
     </lightning-accordion>
   </lightning-modal-body>
