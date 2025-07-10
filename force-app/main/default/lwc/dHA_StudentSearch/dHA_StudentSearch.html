@@ -7,7 +7,7 @@
         <div class="slds-size_2-of-3">
           <div class="slds-grid slds-wrap">
             <!-- Card Body  -->
-            <div class="slds-size_1-of-2">
+            <div class="slds-col slds-size_1-of-2">
               <lightning-input
                 data-name="studentNameInput"
                 type="search"
@@ -16,7 +16,7 @@
               ></lightning-input>
             </div>
 
-            <div class="slds-size_1-of-2">
+            <div class="slds-col slds-size_1-of-2">
               <lightning-input
                 data-name="birthdateInput"
                 type="date"
@@ -26,7 +26,7 @@
               ></lightning-input>
             </div>
 
-            <div class="slds-size_1-of-2">
+            <div class="slds-col slds-size_1-of-2">
               <lightning-combobox
                 data-name="classInput"
                 label="Class"
@@ -55,18 +55,23 @@
       </div>
     </div>
 
-    <div class="slds-box slds-m-top_medium slds-m-horizontal_small">
-      <lightning-datatable
-        key-field="studentId"
-        data={dataTable}
-        columns={columns}
-        show-row-number-column
-        hide-checkbox-column
-        sorted-direction={sortDirection}
-        sorted-by={sortedBy}
-        onsort={onHandleSort}
-        onrowaction={handleRowAction}
-      ></lightning-datatable>
+    <div if:true={isLoaded} class="slds-box slds-m-top_medium slds-m-horizontal_small">
+        <lightning-datatable
+          key-field="studentId"
+          data={dataTable}
+          columns={columns}
+          show-row-number-column
+          hide-checkbox-column
+          sorted-direction={sortDirection}
+          sorted-by={sortedBy}
+          onsort={onHandleSort}
+          onrowaction={handleRowAction}
+        ></lightning-datatable>
     </div>
+
+    <div if:false={isLoaded}>
+      <lightning-spinner alternative-text="Loading..." variant="brand">
+      </lightning-spinner>
+    </div>  
   </lightning-card>
 </template>

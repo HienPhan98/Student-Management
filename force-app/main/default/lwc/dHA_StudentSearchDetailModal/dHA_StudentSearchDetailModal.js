@@ -52,6 +52,7 @@ export default class DHA_StudentSearchDetailModal extends LightningModal {
   @wire(getDetailStudyResultInfo, { studentId: '$recordId' })
   wiredGetDetailStudyResultInfo({ data, error }) {
     if (data) {
+      if(data.length>0){
       let dataFilter = [];
       for (let i = 0; i < data.length; i++) {
         const studyResults = data[i].DHA_Study_Results__r;
@@ -118,6 +119,7 @@ export default class DHA_StudentSearchDetailModal extends LightningModal {
           hideDefaultActions: true
         }
       ];
+    }
     }
     else if (error) {
       const err = error.body.message;

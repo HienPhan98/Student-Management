@@ -15,6 +15,7 @@ export default class dHA_StudentSearch extends LightningElement {
   columns = [];
   sortDirection = "asc";
   sortedBy;
+  isLoaded = true;
 
   @wire(getAllClasses)
   wiredAllClasses({ error, data }) {
@@ -156,6 +157,7 @@ export default class dHA_StudentSearch extends LightningElement {
 
   async handleSearch() {
     try {
+      this.isLoaded = !this.isLoaded; //show spinner while waiting for data loading
       this.dataTable = null;
       this.columns = null;
       const studentName = this.template.querySelector('[data-name="studentNameInput"]').value;
@@ -170,16 +172,17 @@ export default class dHA_StudentSearch extends LightningElement {
           message: "Please provide at least 1 condition to search for students",
           variant: "error"
         });
+        this.isLoaded = !this.isLoaded;
         this.dispatchEvent(event);
         return;
       }
-
+  
       this.dataTable = await searchStudents({
         name: studentName,
         birthDate: birthDate,
         classId: classId
       });
-
+      this.isLoaded = !this.isLoaded;
       console.log("length dataTable is" + this.dataTable.length);
       //show data on table
       this.showDataOnTable(this.dataTable);

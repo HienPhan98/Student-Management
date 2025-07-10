@@ -5,7 +5,7 @@
   <lightning-modal-body>
     <lightning-accordion allow-multiple-sections-open active-section-name={activeSections}>
 
-      <lightning-accordion-section name="studentInfo" label="Student Information">
+      <lightning-accordion-section class="accordion-section" name="studentInfo" label="Student Information">
         <lightning-record-view-form density="compact" object-api-name={objectApiName} record-id={recordId}>
           <div class="slds-grid">
             <div class="slds-col slds-size_1-of-2">
@@ -23,25 +23,29 @@
         </lightning-record-view-form>
       </lightning-accordion-section>
 
-      <lightning-accordion-section name="studyResultInfo" label="Study Result Information">
+      <lightning-accordion-section class="accordion-section" name="studyResultInfo" label="Study Result Information">
         <lightning-layout horizontal-align="space">
-          <lightning-layout-item>
-            <div class="">
-              <div>
-                <label class="slds-form-element__label">Assigned Classes</label>
-                <span>{assignedClasses}</span>
+          <lightning-layout-item size="6">           
+              <div class="slds-form-element slds-form-element_horizontal">
+                <span class="slds-form-element__label">Assigned Classes</span>
+                <div class="slds-form-element__control">
+                  <span class="slds-form-element__static">{assignedClasses}</span>
+                </div>           
               </div>
-              <div>
-                <label class="slds-form-element__label">Average Final Score</label>
-                <span>{averageFinalScore}</span>
-              </div>
-            </div>
+              <div class="slds-form-element slds-form-element_horizontal">
+                <span class="slds-form-element__label">Average Final Score</span>
+                <div class="slds-form-element__control">
+                  <span class="slds-form-element__static">{averageFinalScore}</span>  
+                </div>          
+              </div>         
           </lightning-layout-item>
 
-          <lightning-layout-item>
-            <div>
-              <label class="slds-form-element__label">Class(es) Have Final Score</label>
-              <span>{classesHaveFinalScore}</span>
+          <lightning-layout-item size="6">
+            <div class="slds-form-element slds-form-element_horizontal">
+              <span class="slds-form-element__label">Class(es) Have Final Score</span>
+              <div class="slds-form-element__control">
+                <span class="slds-form-element__static">{classesHaveFinalScore}</span>
+              </div>
             </div>
           </lightning-layout-item>
         </lightning-layout>
