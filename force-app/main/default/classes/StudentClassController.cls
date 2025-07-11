@@ -162,4 +162,23 @@ public with sharing class StudentClassController {
       throw new AuraHandledException(e.getMessage());
     }
   }
+
+  @AuraEnabled(cacheable=true)
+  public static List<DHA_Study_Result__c> getDetailStudyResultInfoV2(String studentId){
+    try {
+      return [SELECT Id, Name, DHA_Class_Assignment__r.DHA_Class__r.Name, Final_Score__c, Result__c, DHA_Class_Assignment__r.DHA_Class__r.Id
+      FROM DHA_Study_Result__c
+      WHERE DHA_Class_Assignment__r.DHA_Student__r.Id =: studentId AND Result__c != NULL
+      WITH SECURITY_ENFORCED];
+    } catch (Exception e) {
+       CustomExceptionData myException = new CustomExceptionData(
+        'StudentClassController',
+        'getDetailStudyResultInfoV2',
+        e.getMessage(),
+        e.getLineNumber().toString()
+      );
+      throw new AuraHandledException(JSON.serialize(myException));
+    }
+  }
+
 }

@@ -1,0 +1,21 @@
+<template>
+  <lightning-card icon-name="standard:account" variant="base">
+    <div slot="title">DHA Study Results</div>
+
+    <div>
+      <!-- Card Body  -->
+      <template if:true={data}>
+        <lightning-datatable
+          key-field="id"
+          data={data}
+          columns={columns}
+          hide-checkbox-column
+        ></lightning-datatable>
+      </template>
+        
+      <template if:false={data}>
+        <span class="slds-p-left_x-small">There is no Study Result for this Student</span>
+      </template>
+    </div>
+  </lightning-card>
+</template>
