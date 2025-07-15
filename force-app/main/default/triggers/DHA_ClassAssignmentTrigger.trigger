@@ -15,17 +15,14 @@ DHA_Management_Setting__c classAssignmentSetting = DHA_Management_Setting__c.get
 if(classAssignmentSetting == null || classAssignmentSetting.Max_Assigned_Class__c == null || classAssignmentSetting.Max_Students_In_Class__c == null){return;}
 
 Integer maxAssignedClass = (Integer) classAssignmentSetting.Max_Assigned_Class__c;
+Integer maxStudentInClass = (Integer) classAssignmentSetting.Max_Students_In_Class__c;
 
 switch on Trigger.operationType {
     when BEFORE_INSERT {
-      DHA_ClassAssignmentTriggerHandler.onBeforeInsert(Trigger.new, maxAssignedClass );
-    }
-    when BEFORE_UPDATE {
-      //DHA_ClassAssignmentTriggerHandler.onBeforeUpdate(Trigger.new);
+      DHA_ClassAssignmentTriggerHandler.onBeforeInsert(Trigger.new, maxAssignedClass, maxStudentInClass);
     }
     when AFTER_INSERT {
       DHA_ClassAssignmentTriggerHandler.onAfterInsert(Trigger.new);
     }
   }
-
 }

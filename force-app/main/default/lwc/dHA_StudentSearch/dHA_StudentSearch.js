@@ -6,7 +6,7 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import DHA_StudentSearchDetailModal from "c/dHA_StudentSearchDetailModal";
 
 const actions = [
-    { label: 'Show details', name: 'show_details'},
+  { label: 'Show details', name: 'show_details' },
 ];
 
 export default class dHA_StudentSearch extends LightningElement {
@@ -53,11 +53,11 @@ export default class dHA_StudentSearch extends LightningElement {
   sortBy(field, reverse, primer) {
     const key = primer
       ? function (x) {
-          return primer(x[field]);
-        }
+        return primer(x[field]);
+      }
       : function (x) {
-          return x[field];
-        };
+        return x[field];
+      };
 
     return function (a, b) {
       a = key(a);
@@ -160,13 +160,24 @@ export default class dHA_StudentSearch extends LightningElement {
       this.isLoaded = !this.isLoaded; //show spinner while waiting for data loading
       this.dataTable = null;
       this.columns = null;
-      const studentName = this.template.querySelector('[data-name="studentNameInput"]').value;
-      const birthDate = this.template.querySelector('[data-name="birthdateInput"]').value;
-      const classId = this.template.querySelector('[data-name="classInput"]').value;
-      let allNonValid = !studentName && !birthDate && !classId;
+      const studentName = this.template.querySelector('[data-name="studentNameInput"]');
+      const birthDate = this.template.querySelector('[data-name="birthdateInput"]');
+      const classId = this.template.querySelector('[data-name="classInput"]');
+      const allNonValue = !studentName.value && !birthDate.value && !classId.value;
+
+      //check if there's any validity from input components
+      const allValidInput = [...[studentName, birthDate]].reduce((validSoFar, inputFields) => {
+        inputFields.reportValidity();
+        return validSoFar && inputFields.checkValidity();
+      }, true);
+
+      if (!allValidInput) {
+        this.isLoaded = !this.isLoaded;
+        return;
+      }
 
       //check if there's not any input is filled
-      if (allNonValid) {
+      if (allNonValue) {
         const event = new ShowToastEvent({
           title: "Failed!",
           message: "Please provide at least 1 condition to search for students",
@@ -176,16 +187,16 @@ export default class dHA_StudentSearch extends LightningElement {
         this.dispatchEvent(event);
         return;
       }
-  
       this.dataTable = await searchStudents({
-        name: studentName,
-        birthDate: birthDate,
-        classId: classId
+        name: studentName.value,
+        birthDate: birthDate.value,
+        classId: classId.value
       });
       this.isLoaded = !this.isLoaded;
       console.log("length dataTable is" + this.dataTable.length);
       //show data on table
       this.showDataOnTable(this.dataTable);
+
     } catch (err) {
       const error = err.body.message;
       const event = new ShowToastEvent({
@@ -206,24 +217,25 @@ export default class dHA_StudentSearch extends LightningElement {
   }
 
   async handleRowAction(event) {
-    try{
-    const actionName = event.detail.action.name;
-    const selectedRows = event.detail.row;
-    switch (actionName) {
-      case "show_details":
-        {
-          console.log("lalalala");
-          await DHA_StudentSearchDetailModal.open({
-            size: "medium",
-            description: "Student Detail",
-            recordId: selectedRows.studentId // Pass to modal via @api decoration
-          });
-        }
-        break;
-      default:
-    }}catch(error){
+    try {
+      const actionName = event.detail.action.name;
+      const selectedRows = event.detail.row;
+      switch (actionName) {
+        case "show_details":
+          {
+            console.log("lalalala");
+            await DHA_StudentSearchDetailModal.open({
+              size: "medium",
+              description: "Student Detail",
+              recordId: selectedRows.studentId // Pass to modal via @api decoration
+            });
+          }
+          break;
+        default:
+      }
+    } catch (error) {
       console.error(JSON.stringify(error));
     }
-    
+
   }
 }
