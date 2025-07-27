@@ -26,12 +26,11 @@ export default class dHA_StudentSearch extends LightningElement {
       }));
     } else if (error) {
       const err = error.body.message;
-      const event = new ShowToastEvent({
-        title: "Failed!",
-        message: `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
-        variant: "error"
-      });
-      this.dispatchEvent(event);
+      this.showToast(
+        "Failed!",
+        `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
+        "error"
+      );
     }
   }
 
@@ -41,13 +40,21 @@ export default class dHA_StudentSearch extends LightningElement {
       this.showDataOnTable(data);
     } else if (error) {
       const err = error.body.message;
-      const event = new ShowToastEvent({
-        title: "Failed!",
-        message: `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
-        variant: "error"
-      });
-      this.dispatchEvent(event);
+      this.showToast(
+        "Failed!",
+        `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
+        "error"
+      );
     }
+  }
+
+  showToast(title, message, variant) {
+    const event = new ShowToastEvent({
+      title: title,
+      message: message,
+      variant: variant
+    })
+    this.dispatchEvent(event);
   }
 
   sortBy(field, reverse, primer) {
@@ -85,12 +92,11 @@ export default class dHA_StudentSearch extends LightningElement {
       //Remove all records found before in table data
       this.dataTable = null;
       this.columns = null;
-      const event = new ShowToastEvent({
-        title: "Failed!",
-        message: "No student was found with your inputs",
-        variant: "error"
-      });
-      this.dispatchEvent(event);
+      this.showToast(
+        "Failed!",
+        "No student was found with your inputs",
+        "error"
+      );
       return;
     }
 
@@ -178,13 +184,11 @@ export default class dHA_StudentSearch extends LightningElement {
 
       //check if there's not any input is filled
       if (allNonValue) {
-        const event = new ShowToastEvent({
-          title: "Failed!",
-          message: "Please provide at least 1 condition to search for students",
-          variant: "error"
-        });
         this.isLoaded = !this.isLoaded;
-        this.dispatchEvent(event);
+        this.showToast(
+          "Failed!",
+          "Please provide at least 1 condition to search for students",
+          "error")
         return;
       }
       this.dataTable = await searchStudents({
@@ -196,15 +200,12 @@ export default class dHA_StudentSearch extends LightningElement {
       console.log("length dataTable is" + this.dataTable.length);
       //show data on table
       this.showDataOnTable(this.dataTable);
-
     } catch (err) {
       const error = err.body.message;
-      const event = new ShowToastEvent({
-        title: "Failed!",
-        message: `${error.className} - ${error.methodName} - ${error.message} - ${error.lineOfCode}`,
-        variant: "error"
-      });
-      this.dispatchEvent(event);
+      this.showToast(
+        "Failed!",
+        `${error.className} - ${error.methodName} - ${error.message} - ${error.lineOfCode}`,
+        "error");
     }
   }
 
@@ -223,7 +224,6 @@ export default class dHA_StudentSearch extends LightningElement {
       switch (actionName) {
         case "show_details":
           {
-            console.log("lalalala");
             await DHA_StudentSearchDetailModal.open({
               size: "medium",
               description: "Student Detail",
