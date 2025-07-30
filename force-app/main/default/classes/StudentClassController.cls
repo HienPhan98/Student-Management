@@ -12,6 +12,7 @@ public with sharing class StudentClassController {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'getAllClasses',
+        e.getTypeName(),
         e.getMessage(),
         e.getLineNumber().toString()
       );
@@ -52,7 +53,10 @@ public with sharing class StudentClassController {
         ]) {
           setStudentIds.add(ca.DHA_Student__r.Id);
         }
-        if (!setStudentIds.isEmpty()) {
+        if(setStudentIds.isEmpty()){
+           filterConditions.add('Id IN (NULL)');
+        }
+        else {
           List<String> idList = new List<String>();
           for (Id sid : setStudentIds) {
             idList.add('\'' + sid + '\'');
@@ -72,6 +76,7 @@ public with sharing class StudentClassController {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'searchStudents',
+        e.getTypeName(),
         e.getMessage(),
         e.getLineNumber().toString()
       );
@@ -95,6 +100,7 @@ public with sharing class StudentClassController {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'getRecentlyViewedStudents',
+        e.getTypeName(),
         e.getMessage(),
         e.getLineNumber().toString()
       );
@@ -137,6 +143,7 @@ public with sharing class StudentClassController {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'getSummaryStudyResultInfo',
+        e.getTypeName(),
         e.getMessage(),
         e.getLineNumber().toString()
       );
@@ -159,7 +166,14 @@ public with sharing class StudentClassController {
         WITH SECURITY_ENFORCED
       ];
     } catch (Exception e) {
-      throw new AuraHandledException(e.getMessage());
+      CustomExceptionData myException = new CustomExceptionData(
+        'StudentClassController',
+        'getDetailStudyResultInfo',
+        e.getTypeName(),
+        e.getMessage(),
+        e.getLineNumber().toString()
+      );
+      throw new AuraHandledException(JSON.serialize(myException));
     }
   }
 
@@ -174,6 +188,7 @@ public with sharing class StudentClassController {
        CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'getDetailStudyResultInfoV2',
+        e.getTypeName(),
         e.getMessage(),
         e.getLineNumber().toString()
       );

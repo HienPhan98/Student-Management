@@ -1,4 +1,4 @@
-public with sharing class StudentResultInformation {
+public class StudentResultInformation {
     @AuraEnabled public Integer numberOfAssignedClass;
     @AuraEnabled public Integer numberOfClassHasFinalScore;
     @AuraEnabled public List<String> averageFinalScores;
