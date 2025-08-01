@@ -130,7 +130,7 @@ public with sharing class StudentClassController {
       for (DHA_Class_Assignment__c ca : listAssignment) {
         List<DHA_Study_Result__c> listStudyResult = ca.DHA_Study_Results__r;
         if (listStudyResult.size() > 0) {
-          countClassHasFinalScore = listStudyResult.size();
+          countClassHasFinalScore++;
           for(DHA_Study_Result__c studyResult : listStudyResult) 
           {
             averageScores.add(studyResult.Final_Score__c.toString());
@@ -152,35 +152,9 @@ public with sharing class StudentClassController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static List<DHA_Class_Assignment__c> getDetailStudyResultInfo(String studentId){
-    try {
-      return [
-        SELECT Id,DHA_Class__r.Id,DHA_Class__r.Name,
-          (
-            SELECT 	Score_1__c, Score_2__c, Score_3__c,Final_Score__c, Result__c
-            FROM DHA_Study_Results__r
-            WHERE Final_Score__c != NULL
-          )
-        FROM DHA_Class_Assignment__c
-        WHERE DHA_Student__r.Id = :studentId
-        WITH SECURITY_ENFORCED
-      ];
-    } catch (Exception e) {
-      CustomExceptionData myException = new CustomExceptionData(
-        'StudentClassController',
-        'getDetailStudyResultInfo',
-        e.getTypeName(),
-        e.getMessage(),
-        e.getLineNumber().toString()
-      );
-      throw new AuraHandledException(JSON.serialize(myException));
-    }
-  }
-
-  @AuraEnabled(cacheable=true)
   public static List<DHA_Study_Result__c> getDetailStudyResultInfoV2(String studentId){
     try {
-      return [SELECT Id, Name, DHA_Class_Assignment__r.DHA_Class__r.Name, Final_Score__c, Result__c, DHA_Class_Assignment__r.DHA_Class__r.Id
+      return [SELECT Id, Name, DHA_Class_Assignment__r.DHA_Class__r.Name, DHA_Class_Assignment__r.DHA_Class__r.Id, Score_1__c, Score_2__c, Score_3__c,Final_Score__c, Result__c 
       FROM DHA_Study_Result__c
       WHERE DHA_Class_Assignment__r.DHA_Student__r.Id =: studentId AND Result__c != NULL
       WITH SECURITY_ENFORCED];

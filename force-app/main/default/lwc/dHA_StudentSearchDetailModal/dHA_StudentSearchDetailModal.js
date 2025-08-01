@@ -8,7 +8,7 @@ import AGE_FIELD from "@salesforce/schema/DHA_Student__c.Age__c";
 import EMAIL_FIELD from "@salesforce/schema/DHA_Student__c.Email__c";
 import { wire } from "lwc";
 import getSummaryStudyResultInfo from "@salesforce/apex/StudentClassController.getSummaryStudyResultInfo";
-import getDetailStudyResultInfo from "@salesforce/apex/StudentClassController.getDetailStudyResultInfo";
+import getDetailStudyResultInfoV2 from "@salesforce/apex/StudentClassController.getDetailStudyResultInfoV2";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { api } from "lwc";
 import LightningModal from "lightning/modal";
@@ -49,29 +49,19 @@ export default class DHA_StudentSearchDetailModal extends LightningModal {
     }
   }
 
-  @wire(getDetailStudyResultInfo, { studentId: '$recordId' })
+  @wire(getDetailStudyResultInfoV2, { studentId: '$recordId' })
   wiredGetDetailStudyResultInfo({ data, error }) {
     if (data) {
       if(data.length>0){
-      let dataFilter = [];
-      for (let i = 0; i < data.length; i++) {
-        const studyResults = data[i].DHA_Study_Results__r;
-        if (studyResults && studyResults.length > 0) {
-          for (let j = 0; j < data[i].DHA_Study_Results__r.length; j++) {
-            let object = {};
-            object.className = data[i].DHA_Class__r.Name;
-            object.classLink = `/lightning/r/DHA_Class__c/${data[i].DHA_Class__r.Id}/view`
-            object.score1 = data[i].DHA_Study_Results__r[j].Score_1__c;
-            object.score2 = data[i].DHA_Study_Results__r[j].Score_2__c;
-            object.score3 = data[i].DHA_Study_Results__r[j].Score_3__c;
-            object.finalScore = data[i].DHA_Study_Results__r[j].Final_Score__c;
-            object.result = data[i].DHA_Study_Results__r[j].Result__c;
-            dataFilter.push(object);
-          }
-        }
-      }
-
-      this.data = dataFilter;
+      this.data = data.map(item => ({
+        className: item.DHA_Class_Assignment__r.DHA_Class__r.Name,
+        classLink: `/lightning/r/DHA_Class__c/${item.DHA_Class_Assignment__r.DHA_Class__r.Id}/view`,
+        score1: item.Score_1__c,
+        score2: item.Score_2__c,
+        score3: item.Score_3__c,
+        finalScore: item.Final_Score__c,
+        result: item.Result__c
+      }));
 
       //set columns of table
       this.columns = [
