@@ -3,7 +3,7 @@ private class TestStudentClassController {
   @isTest
   static void checkSearchStudentsWithNameAndBirthdate() {
     //Make sure trigger is inactive for the search function testing purpose only
-    TestDataFactory.setTriggerFlags(false, false);
+    TestDataFactory.setTriggerFlags(false, false, false);
 
     //setup test data
     Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
@@ -18,7 +18,7 @@ private class TestStudentClassController {
   @isTest
   static void checkSearchStudentsWithNameAndValidClass() {
     //Make sure trigger is inactive for the search function testing purpose only
-    TestDataFactory.setTriggerFlags(false, false);
+     TestDataFactory.setTriggerFlags(false, false, false);
 
     //setup test data
     Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
@@ -35,7 +35,7 @@ private class TestStudentClassController {
   @isTest
   static void checkSearchStudentsWithNameAndInvalidClass() {
     //Make sure trigger is inactive for the search function testing purpose only
-    TestDataFactory.setTriggerFlags(false, false);
+    TestDataFactory.setTriggerFlags(false, false, false);
 
     //setup test data
     Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
@@ -51,7 +51,7 @@ private class TestStudentClassController {
   @isTest
   static void checkGetSummaryStudyResultInfo() {
   //Make sure trigger is inactive for the getSummaryStudyResultInfo testing purpose only
-  TestDataFactory.setTriggerFlags(false, false);
+  TestDataFactory.setTriggerFlags(false, false, false);
 
   //setup test data
   Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
@@ -69,7 +69,7 @@ private class TestStudentClassController {
   @isTest
   static void checkGetDetailStudyResultInfoV2() {
   //Make sure trigger is inactive for the getSummaryStudyResultInfo testing purpose only
-  TestDataFactory.setTriggerFlags(false, false);
+  TestDataFactory.setTriggerFlags(false, false, false);
 
   //setup test data
   Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
@@ -86,7 +86,7 @@ private class TestStudentClassController {
   @isTest
   static void checkGetAllClasses() {
    //Make sure trigger is inactive for the getSummaryStudyResultInfo testing purpose only
-  TestDataFactory.setTriggerFlags(false, false);
+  TestDataFactory.setTriggerFlags(false, false, false);
   //setup test data
   Map<String, List<SObject>> mapObjects = TestDataFactory.createStudentsWithClassAssignments(200,10);
   List<DHA_Class__c> listClasses = StudentClassController.getAllClasses();

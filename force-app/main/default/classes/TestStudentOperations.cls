@@ -6,8 +6,8 @@
 private class TestStudentOperations {
   @isTest
   static void checkInsertStudentWithShortNameAndBirthdate() {
-     // Make sure trigger is active
-    TestDataFactory.setTriggerFlags(true,false);
+    // Make sure trigger is active
+    TestDataFactory.setTriggerFlags(true,false, false);
     // Set up test data
     List<DHA_Student__c> students = TestDataFactory.createStudents(
       200,
@@ -35,7 +35,7 @@ private class TestStudentOperations {
   @isTest
   static void checkInsertStudentWithInvalidAge() {
      // Make sure trigger is active
-    TestDataFactory.setTriggerFlags(true,false);
+    TestDataFactory.setTriggerFlags(true,false, false);
     // Set up test data
     List<DHA_Student__c> students = TestDataFactory.createStudents(
       200,
@@ -60,7 +60,7 @@ private class TestStudentOperations {
   @isTest
   static void checkUpdateStudentWithInvalidAgeAndShortName() {
      // Make sure trigger is active
-    TestDataFactory.setTriggerFlags(true,false);
+    TestDataFactory.setTriggerFlags(true,false, false);
     
     List<DHA_Student__c> students = TestDataFactory.createStudents(
       200,

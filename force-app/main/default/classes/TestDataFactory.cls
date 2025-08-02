@@ -2,29 +2,30 @@
 public class TestDataFactory {
   public static void setTriggerFlags(
     Boolean isStudentTriggerActive,
-    Boolean isClassAssignmentTriggerActive
+    Boolean isClassAssignmentTriggerActive,
+    Boolean isStudyReulstTriggerActive
   ) {
     // Upsert DHA_Trigger_Setting__c custom setting
     DHA_Trigger_Setting__c setting = new DHA_Trigger_Setting__c(
       SetupOwnerId = UserInfo.getOrganizationId(),
       Is_Student_Trigger_Active__c = isStudentTriggerActive,
-      Is_Class_Assignment_Trigger_Active__c = isClassAssignmentTriggerActive 
+      Is_Class_Assignment_Trigger_Active__c = isClassAssignmentTriggerActive,
+      Is_Study_Result_Trigger_Active__c =  isStudyReulstTriggerActive
     );
     upsert setting;
-
-    // Force query to "commit" to test context cache
-    //setting = [SELECT Id FROM DHA_Trigger_Setting__c WHERE SetupOwnerId = :UserInfo.getOrganizationId()];
   }
 
   public static void setManagementSetting(
     Integer maxAssignedClass,
-    Integer maxStudentsInClass
+    Integer maxStudentsInClass,
+    Integer passScore
   ) {
     // Upsert DHA_Management_Setting__c custom setting
     DHA_Management_Setting__c setting = new DHA_Management_Setting__c(
       SetupOwnerId = UserInfo.getOrganizationId(),
       Max_Assigned_Class__c = maxAssignedClass,
-      Max_Students_In_Class__c = maxStudentsInClass
+      Max_Students_In_Class__c = maxStudentsInClass,
+      Pass_Score__c = passScore
     );
     upsert setting;
   }
@@ -95,6 +96,7 @@ public class TestDataFactory {
     }
     insert studyResultList;
     
+    mapResult.put('StudyResult', studyResultList);
     mapResult.put('Student', studentList);
     mapResult.put('Class', classList);
 
