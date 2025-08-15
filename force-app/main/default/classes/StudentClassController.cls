@@ -54,24 +54,26 @@ public with sharing class StudentClassController {
           setStudentIds.add(ca.DHA_Student__r.Id);
         }
         if(setStudentIds.isEmpty()){
-           filterConditions.add('Id IN (NULL)');
+           filterConditions.add('Id IN (NULL)'); // 'Id IN ('Id1' , 'Id2', 'Id3')'
         }
         else {
           List<String> idList = new List<String>();
           for (Id sid : setStudentIds) {
             idList.add('\'' + sid + '\'');
           }
-          filterConditions.add('Id IN (' + String.join(idList, ',') + ')');
+          filterConditions.add('Id IN (' + String.join(idList, ',') + ')'); // 'Id IN : variable'
         }
       }
 
+      List<DHA_Student__c> listQuery = new List<DHA_Student__c>();
       if (!filterConditions.isEmpty()) {
         originalQuery += ' WHERE ' + String.join(filterConditions, ' AND ');
-        originalQuery += ' LIMIT 50';
+        //originalQuery += ' LIMIT 50';
         system.debug('totalQuery:  ' + originalQuery);
-        return Database.query(originalQuery);
+        listQuery = Database.query(originalQuery);
       }
-      return new List<DHA_Student__c>();
+
+      return listQuery;
     } catch (Exception e) {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',

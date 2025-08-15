@@ -9,13 +9,80 @@ const actions = [
   { label: 'Show details', name: 'show_details' },
 ];
 
+const columns = [
+  {
+    label: "Student Code",
+    fieldName: "studentCode",
+    type: "text",
+    hideDefaultActions: true,
+    sortable: true
+  },
+  {
+    label: "Student Name",
+    fieldName: "recordLink",
+    type: "url",
+    hideDefaultActions: true,
+    typeAttributes: {
+      label: { fieldName: "studentName" },
+      target: "_blank"
+    },
+    cellAttributes: {
+      class: "slds-text-link_reset"
+    }
+  },
+  {
+    label: "Birthdate",
+    fieldName: "studentBirthdate",
+    type: "date-local",
+    hideDefaultActions: true,
+    typeAttributes: {
+      day: "2-digit",
+      month: "2-digit"
+    }
+  },
+  {
+    label: "Address",
+    fieldName: "studentAddress",
+    hideDefaultActions: true,
+    type: "text"
+  },
+  {
+    label: "Email",
+    fieldName: "studentEmail",
+    hideDefaultActions: true,
+    type: "email"
+  },
+  { type: "action", typeAttributes: { rowActions: actions } }
+];
+
 export default class dHA_StudentSearch extends LightningElement {
   classes = [];
   dataTable = [];
-  columns = [];
+  allResults = [];
+  columns = columns;
   sortDirection = "asc";
   sortedBy;
   isLoaded = true;
+
+  retrievedResults = 0;
+  recordsPerPage = 15;
+  currentPage = 1;
+  totalPages = 0;
+  paginatedData = [];
+  startIndex = 0;
+  endIndex = this.recordsPerPage;
+  isFirstPage = true;
+  isLastPage = true;
+
+  resetPaginatedData() {
+    this.retrievedResults = 0;
+    this.totalPages = 0;
+    this.startIndex = 0;
+    this.endIndex = this.recordsPerPage;
+    this.currentPage = 1;
+    this.isFirstPage = true;
+    this.isLastPage = true;
+  }
 
   @wire(getAllClasses)
   wiredAllClasses({ error, data }) {
@@ -25,7 +92,7 @@ export default class dHA_StudentSearch extends LightningElement {
         value: item.Id
       }));
     } else if (error) {
-      const err = error.body.message;
+      const err = JSON.parse(error.body.message); // JSON.parse
       this.showToast(
         "Failed!",
         `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
@@ -39,7 +106,7 @@ export default class dHA_StudentSearch extends LightningElement {
     if (data) {
       this.showDataOnTable(data);
     } else if (error) {
-      const err = error.body.message;
+      const err = JSON.parse(error.body.message); // JSON.parse
       this.showToast(
         "Failed!",
         `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
@@ -90,8 +157,7 @@ export default class dHA_StudentSearch extends LightningElement {
     //check if no record was found with filter values, then return error immediately
     if (listStudents.length === 0) {
       //Remove all records found before in table data
-      this.dataTable = null;
-      this.columns = null;
+      this.dataTable = [];
       this.showToast(
         "Failed!",
         "No student was found with your inputs",
@@ -111,61 +177,16 @@ export default class dHA_StudentSearch extends LightningElement {
       recordLink: `/lightning/r/DHA_Student__c/${item.Id}/view`
     }));
 
-    //set columns of table
-    this.columns = [
-      {
-        label: "Student Code",
-        fieldName: "studentCode",
-        type: "text",
-        hideDefaultActions: true,
-        sortable: true
-      },
-      {
-        label: "Student Name",
-        fieldName: "recordLink",
-        type: "url",
-        hideDefaultActions: true,
-        typeAttributes: {
-          label: { fieldName: "studentName" },
-          target: "_blank"
-        },
-        cellAttributes: {
-          class: "slds-text-link_reset"
-        }
-      },
-      {
-        label: "Birthdate",
-        fieldName: "studentBirthdate",
-        type: "date-local",
-        hideDefaultActions: true,
-        typeAttributes: {
-          day: "2-digit",
-          month: "2-digit"
-        }
-      },
-      {
-        label: "Address",
-        fieldName: "studentAddress",
-        hideDefaultActions: true,
-        type: "text"
-      },
-      {
-        label: "Email",
-        fieldName: "studentEmail",
-        hideDefaultActions: true,
-        type: "email"
-      },
-      { type: "action", typeAttributes: { rowActions: actions } }
-    ];
     //Apply the previous sort direction and column
     this.sortDataDirection(this.sortedBy, this.sortDirection);
   }
 
   async handleSearch() {
     try {
+      this.resetPaginatedData(); //reset index and current page for paginated data
       this.isLoaded = !this.isLoaded; //show spinner while waiting for data loading
-      this.dataTable = null;
-      this.columns = null;
+      this.allResults = [];
+
       const studentName = this.template.querySelector('[data-name="studentNameInput"]');
       const birthDate = this.template.querySelector('[data-name="birthdateInput"]');
       const classId = this.template.querySelector('[data-name="classInput"]');
@@ -191,30 +212,66 @@ export default class dHA_StudentSearch extends LightningElement {
           "error")
         return;
       }
-      this.dataTable = await searchStudents({
+      this.allResults = await searchStudents({
         name: studentName.value,
         birthDate: birthDate.value,
         classId: classId.value
       });
+
+      //paginate data table
+      this.retrievedResults = this.allResults.length;
+      this.totalPages = Math.ceil(this.allResults.length / this.recordsPerPage);
+
+      //on first search paginates with number of recordsPerPage
+      this.paginatedData = this.allResults.slice(this.startIndex, this.endIndex);
       this.isLoaded = !this.isLoaded;
-      console.log("length dataTable is" + this.dataTable.length);
       //show data on table
-      this.showDataOnTable(this.dataTable);
-    } catch (err) {
-      const error = err.body.message;
+      if (this.paginatedData.length > this.recordsPerPage) { this.isLastPage = false; }
+      this.showDataOnTable(this.paginatedData);
+    } catch (error) {
+      const err = JSON.parse(error.body.message); // JSON.parse
       this.showToast(
         "Failed!",
-        `${error.className} - ${error.methodName} - ${error.message} - ${error.lineOfCode}`,
+        `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
         "error");
     }
+  }
+
+  handleNext() {
+    this.isFirstPage = false;
+    this.currentPage++;
+    this.startIndex += this.recordsPerPage;
+    this.endIndex += this.recordsPerPage;
+    //check if there's no data left in table
+    if (this.currentPage === this.totalPages) {
+      this.isLastPage = true;
+    }
+    this.paginatedData = this.allResults.slice(this.startIndex, this.endIndex);
+    //show data on table
+    this.showDataOnTable(this.paginatedData);
+  }
+
+  handlePrevious() {
+    this.isLastPage = false;
+    this.currentPage--;
+    this.startIndex -= this.recordsPerPage;
+    this.endIndex -= this.recordsPerPage;
+    //check if there's no data left in table
+    if (this.currentPage === 1) {
+      this.isFirstPage = true;
+    }
+    this.paginatedData = this.allResults.slice(this.startIndex, this.endIndex);
+    //show data on table
+    this.showDataOnTable(this.paginatedData);
   }
 
   handleClear() {
     this.template.querySelector('[data-name="studentNameInput"]').value = "";
     this.template.querySelector('[data-name="birthdateInput"]').value = "";
     this.template.querySelector('[data-name="classInput"]').value = "";
-    this.dataTable = null;
-    this.columns = null;
+    this.allResults = [];
+    this.dataTable = [];
+    this.resetPaginatedData();
   }
 
   async handleRowAction(event) {
@@ -236,6 +293,5 @@ export default class dHA_StudentSearch extends LightningElement {
     } catch (error) {
       console.error(JSON.stringify(error));
     }
-
   }
 }

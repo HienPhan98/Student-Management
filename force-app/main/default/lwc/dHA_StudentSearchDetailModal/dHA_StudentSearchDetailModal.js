@@ -13,58 +13,7 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { api } from "lwc";
 import LightningModal from "lightning/modal";
 
-export default class DHA_StudentSearchDetailModal extends LightningModal {
-  activeSections = ["studentInfo", "studyResultInfo"];
-  objectApiName = DHA_STUDENT_OBJECT;
-  nameField = NAME_FIELD;
-  birthdateField = BIRTHDATE_FIELD;
-  genderField = GENDER_FIELD;
-  addressField = ADDRESS_FIELD;
-  studentCodeField = STUDENT_CODE_FIELD;
-  ageField = AGE_FIELD;
-  emailField = EMAIL_FIELD;
-  @api recordId; //will receive from the DHA_StudentSearch component via rowAction event
-  assignedClasses;
-  averageFinalScore;
-  classesHaveFinalScore;
-  data = [];
-  columns = [];
-
-  @wire(getSummaryStudyResultInfo, { studentId: '$recordId' })
-  wiredGetSummaryStudyResultInfo({ data, error }) {
-    if (data) {
-      this.assignedClasses = data.numberOfAssignedClass;
-      this.classesHaveFinalScore = data.numberOfClassHasFinalScore;
-      if (data.averageFinalScores.length === 0) {
-        this.averageFinalScore = "0";
-      } else { this.averageFinalScore = data.averageFinalScores.join(', '); }
-    } else if (error) {
-      const err = error.body.message;
-      const event = new ShowToastEvent({
-        title: "Failed!",
-        message: `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
-        variant: "error"
-      });
-      this.dispatchEvent(event);
-    }
-  }
-
-  @wire(getDetailStudyResultInfoV2, { studentId: '$recordId' })
-  wiredGetDetailStudyResultInfo({ data, error }) {
-    if (data) {
-      if(data.length>0){
-      this.data = data.map(item => ({
-        className: item.DHA_Class_Assignment__r.DHA_Class__r.Name,
-        classLink: `/lightning/r/DHA_Class__c/${item.DHA_Class_Assignment__r.DHA_Class__r.Id}/view`,
-        score1: item.Score_1__c,
-        score2: item.Score_2__c,
-        score3: item.Score_3__c,
-        finalScore: item.Final_Score__c,
-        result: item.Result__c
-      }));
-
-      //set columns of table
-      this.columns = [
+const columns = [
         {
           label: "Class",
           fieldName: "classLink",
@@ -109,6 +58,56 @@ export default class DHA_StudentSearchDetailModal extends LightningModal {
           hideDefaultActions: true
         }
       ];
+
+export default class DHA_StudentSearchDetailModal extends LightningModal {
+  activeSections = ["studentInfo", "studyResultInfo"];
+  objectApiName = DHA_STUDENT_OBJECT;
+  nameField = NAME_FIELD;
+  birthdateField = BIRTHDATE_FIELD;
+  genderField = GENDER_FIELD;
+  addressField = ADDRESS_FIELD;
+  studentCodeField = STUDENT_CODE_FIELD;
+  ageField = AGE_FIELD;
+  emailField = EMAIL_FIELD;
+  @api recordId; //will receive from the DHA_StudentSearch component via rowAction event
+  assignedClasses;
+  averageFinalScore;
+  classesHaveFinalScore;
+  data = [];
+  columns = columns;
+
+  @wire(getSummaryStudyResultInfo, { studentId: '$recordId' })
+  wiredGetSummaryStudyResultInfo({ data, error }) {
+    if (data) {
+      this.assignedClasses = data.numberOfAssignedClass;
+      this.classesHaveFinalScore = data.numberOfClassHasFinalScore;
+      if (data.averageFinalScores.length === 0) {
+        this.averageFinalScore = "0";
+      } else { this.averageFinalScore = data.averageFinalScores.join(', '); }
+    } else if (error) {
+      const err = error.body.message;
+      const event = new ShowToastEvent({
+        title: "Failed!",
+        message: `${err.className} - ${err.methodName} - ${err.message} - ${err.lineOfCode}`,
+        variant: "error"
+      });
+      this.dispatchEvent(event);
+    }
+  }
+
+  @wire(getDetailStudyResultInfoV2, { studentId: '$recordId' })
+  wiredGetDetailStudyResultInfo({ data, error }) {
+    if (data) {
+      if(data.length>0){
+      this.data = data.map(item => ({
+        className: item.DHA_Class_Assignment__r.DHA_Class__r.Name,
+        classLink: `/lightning/r/DHA_Class__c/${item.DHA_Class_Assignment__r.DHA_Class__r.Id}/view`,
+        score1: item.Score_1__c,
+        score2: item.Score_2__c,
+        score3: item.Score_3__c,
+        finalScore: item.Final_Score__c,
+        result: item.Result__c
+      }));    
     }
     }
     else if (error) {

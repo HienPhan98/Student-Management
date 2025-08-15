@@ -56,7 +56,40 @@
       </div>
     </div>
 
-    <div if:true={isLoaded} class="slds-box slds-m-top_medium slds-m-horizontal_small">
+    <div
+      if:true={isLoaded}
+      class="slds-box slds-m-top_medium slds-m-horizontal_small"
+    >
+      <div>
+        <h2 class="slds-text-heading_medium">
+          Retrieved Results: {retrievedResults}
+        </h2>
+        <template lwc:if={retrievedResults}>
+          <!-- Back Button -->
+          <lightning-button-icon
+            icon-name="utility:chevronleft"
+            alternative-text="Previous"
+            onclick={handlePrevious}
+            disabled={isFirstPage}
+          >
+          </lightning-button-icon>
+
+          <!-- Page Number Display -->
+          <span class="slds-p-horizontal_small">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <!-- Forward Button -->
+          <lightning-button-icon
+            icon-name="utility:chevronright"
+            alternative-text="Next"
+            onclick={handleNext}
+            disabled={isLastPage}
+          >
+          </lightning-button-icon>
+        </template>
+      </div>
+      <div>
         <lightning-datatable
           key-field="studentId"
           data={dataTable}
@@ -68,11 +101,12 @@
           onsort={onHandleSort}
           onrowaction={handleRowAction}
         ></lightning-datatable>
+      </div>
     </div>
 
     <div if:false={isLoaded}>
       <lightning-spinner alternative-text="Loading..." variant="brand">
       </lightning-spinner>
-    </div>  
+    </div>
   </lightning-card>
 </template>
