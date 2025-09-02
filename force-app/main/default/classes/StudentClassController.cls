@@ -21,7 +21,11 @@ public with sharing class StudentClassController {
   }
 
   @AuraEnabled
-  public static List<DHA_Student__c> searchStudents(String name, String birthDate, String classId) {
+  public static List<DHA_Student__c> searchStudents(
+    String name,
+    String birthDate,
+    String classId
+  ) {
     System.debug(name + ' - ' + birthDate + ' - ' + classId);
     List<String> filterConditions = new List<String>();
     List<String> fieldsToSelect = new List<String>{
@@ -33,7 +37,11 @@ public with sharing class StudentClassController {
       'Email__c'
     };
     String objectToQueryFrom = 'DHA_Student__c';
-    String originalQuery ='SELECT ' + String.join(fieldsToSelect, ', ') + ' FROM ' + objectToQueryFrom;
+    String originalQuery =
+      'SELECT ' +
+      String.join(fieldsToSelect, ', ') +
+      ' FROM ' +
+      objectToQueryFrom;
     try {
       if (String.isNotBlank(name)) {
         filterConditions.add(
@@ -53,10 +61,9 @@ public with sharing class StudentClassController {
         ]) {
           setStudentIds.add(ca.DHA_Student__r.Id);
         }
-        if(setStudentIds.isEmpty()){
-           filterConditions.add('Id IN (NULL)'); // 'Id IN ('Id1' , 'Id2', 'Id3')'
-        }
-        else {
+        if (setStudentIds.isEmpty()) {
+          filterConditions.add('Id IN (NULL)'); // 'Id IN ('Id1' , 'Id2', 'Id3')'
+        } else {
           List<String> idList = new List<String>();
           for (Id sid : setStudentIds) {
             idList.add('\'' + sid + '\'');
@@ -111,13 +118,16 @@ public with sharing class StudentClassController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static StudentResultInformation getSummaryStudyResultInfo(String studentId) {
+  public static StudentResultInformation getSummaryStudyResultInfo(
+    String studentId
+  ) {
     try {
       Integer countAssignedClasses;
       Integer countClassHasFinalScore = 0;
       List<String> averageScores = new List<String>();
       List<DHA_Class_Assignment__c> listAssignment = [
-        SELECT Id,
+        SELECT
+          Id,
           (
             SELECT Final_Score__c
             FROM DHA_Study_Results__r
@@ -133,14 +143,23 @@ public with sharing class StudentClassController {
         List<DHA_Study_Result__c> listStudyResult = ca.DHA_Study_Results__r;
         if (listStudyResult.size() > 0) {
           countClassHasFinalScore++;
-          for(DHA_Study_Result__c studyResult : listStudyResult) 
-          {
+          for (DHA_Study_Result__c studyResult : listStudyResult) {
             averageScores.add(studyResult.Final_Score__c.toString());
           }
         }
       }
-      system.debug(countAssignedClasses + '---' + countClassHasFinalScore + '---' + averageScores);
-      return new StudentResultInformation(countAssignedClasses, countClassHasFinalScore, averageScores);
+      system.debug(
+        countAssignedClasses +
+          '---' +
+          countClassHasFinalScore +
+          '---' +
+          averageScores
+      );
+      return new StudentResultInformation(
+        countAssignedClasses,
+        countClassHasFinalScore,
+        averageScores
+      );
     } catch (Exception e) {
       CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
@@ -154,14 +173,29 @@ public with sharing class StudentClassController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static List<DHA_Study_Result__c> getDetailStudyResultInfoV2(String studentId){
+  public static List<DHA_Study_Result__c> getDetailStudyResultInfoV2(
+    String studentId
+  ) {
     try {
-      return [SELECT Id, Name, DHA_Class_Assignment__r.DHA_Class__r.Name, DHA_Class_Assignment__r.DHA_Class__r.Id, Score_1__c, Score_2__c, Score_3__c,Final_Score__c, Result__c 
-      FROM DHA_Study_Result__c
-      WHERE DHA_Class_Assignment__r.DHA_Student__r.Id =: studentId AND Result__c != NULL
-      WITH SECURITY_ENFORCED];
+      return [
+        SELECT
+          Id,
+          Name,
+          DHA_Class_Assignment__r.DHA_Class__r.Name,
+          DHA_Class_Assignment__r.DHA_Class__r.Id,
+          Score_1__c,
+          Score_2__c,
+          Score_3__c,
+          Final_Score__c,
+          Result__c
+        FROM DHA_Study_Result__c
+        WHERE
+          DHA_Class_Assignment__r.DHA_Student__r.Id = :studentId
+          AND Result__c != NULL
+        WITH SECURITY_ENFORCED
+      ];
     } catch (Exception e) {
-       CustomExceptionData myException = new CustomExceptionData(
+      CustomExceptionData myException = new CustomExceptionData(
         'StudentClassController',
         'getDetailStudyResultInfoV2',
         e.getTypeName(),
@@ -172,4 +206,31 @@ public with sharing class StudentClassController {
     }
   }
 
+  @AuraEnabled
+  public static void createClassAssignment(
+    String studentId,
+    List<String> classIds
+  ) {
+    List<DHA_Class_Assignment__c> listClassAssignment = new List<DHA_Class_Assignment__c>();
+    for (String classId : classIds) {
+      listClassAssignment.add(
+        new DHA_Class_Assignment__c(
+          DHA_Student__c = studentId,
+          DHA_Class__c = classId
+        )
+      );
+    }
+    try {
+      insert listClassAssignment;
+    } catch (Exception e) {
+      CustomExceptionData myException = new CustomExceptionData(
+        'StudentClassController',
+        'createClassAssignment',
+        e.getTypeName(),
+        e.getMessage(),
+        e.getLineNumber().toString()
+      );
+      throw new AuraHandledException(JSON.serialize(myException));
+    }
+  }
 }
